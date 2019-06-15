@@ -91,4 +91,68 @@ public class ExtFlightDelaysDAO {
 			throw new RuntimeException("Error Connection Database");
 		}
 	}
+
+	public boolean superaNumero(int n, Airport airport) {
+		// TODO Auto-generated method stub
+		String sql = "SELECT COUNT(*) as tot FROM flights f WHERE f.ORIGIN_AIRPORT_ID = ? OR f.DESTINATION_AIRPORT_ID = ?";
+
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, airport.getId());
+			st.setInt(2, airport.getId());
+			ResultSet rs = st.executeQuery();
+
+			if (rs.next()) {
+				if(rs.getInt("tot") >= n) {
+					conn.close();
+					return true;
+				} else {
+					conn.close();
+					return false;
+				}
+			}
+
+			conn.close();
+			return false;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+
+	public double isEdge(Airport airport, Airport airport2) {
+		// TODO Auto-generated method stub
+		
+		String sql = "SELECT COUNT(*) as tot,AVG(f.ELAPSED_TIME) AS media FROM flights f WHERE ((f.ORIGIN_AIRPORT_ID = ? and f.DESTINATION_AIRPORT_ID = ?) OR (f.ORIGIN_AIRPORT_ID = ? and f.DESTINATION_AIRPORT_ID = ?))";
+		double val = 0;
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, airport.getId());
+			st.setInt(2, airport2.getId());
+			st.setInt(3, airport2.getId());
+			st.setInt(4, airport.getId());
+			ResultSet rs = st.executeQuery();
+
+			if (rs.next()) {
+				
+				if(rs.getInt("tot") > 0)
+					val = rs.getDouble("media");
+				
+			}
+
+			conn.close();
+			return val;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+
 }

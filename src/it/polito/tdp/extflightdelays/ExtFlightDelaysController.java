@@ -7,6 +7,7 @@ package it.polito.tdp.extflightdelays;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.extflightdelays.model.Airport;
 import it.polito.tdp.extflightdelays.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,7 +36,7 @@ public class ExtFlightDelaysController {
     private Button btnAnalizza; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbBoxAeroportoPartenza"
-    private ComboBox<?> cmbBoxAeroportoPartenza; // Value injected by FXMLLoader
+    private ComboBox<Airport> cmbBoxAeroportoPartenza; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAeroportiConnessi"
     private Button btnAeroportiConnessi; // Value injected by FXMLLoader
@@ -49,11 +50,32 @@ public class ExtFlightDelaysController {
     @FXML
     void doAnalizzaAeroporti(ActionEvent event) {
 
+    	txtResult.clear();
+    	
+    	try {
+    		
+    		int n = Integer.parseInt(this.voliMinimo.getText());
+    		
+    		model.creaGrafo(n);
+    		this.cmbBoxAeroportoPartenza.getItems().clear();
+    		this.cmbBoxAeroportoPartenza.getItems().addAll(model.getVertex());
+    		
+    	} catch (NumberFormatException e) {
+			// TODO: handle exception
+    		e.printStackTrace();
+		}
     }
 
     @FXML
     void doCalcolaAeroportiConnessi(ActionEvent event) {
 
+    	txtResult.clear();
+    	txtResult.appendText("Aeroporti connessi: \n");
+    	for(String s : model.getConnessi(this.cmbBoxAeroportoPartenza.getValue())) {
+    		
+    		txtResult.appendText(s);
+    		
+    	}
     }
 
     @FXML
