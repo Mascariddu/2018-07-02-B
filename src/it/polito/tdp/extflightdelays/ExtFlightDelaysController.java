@@ -80,7 +80,20 @@ public class ExtFlightDelaysController {
 
     @FXML
     void doCercaItinerario(ActionEvent event) {
-
+    	
+    	txtResult.clear();
+    	
+    	try {
+    		
+    		double n = Double.parseDouble(this.numeroOreTxtInput.getText());
+    		for(Airport airport : model.cercaItinerario(n,this.cmbBoxAeroportoPartenza.getValue()))
+    			txtResult.appendText(airport.getAirportName()+"\n");
+    	
+    	} catch (NumberFormatException e) {
+			// TODO: handle exception
+    		e.printStackTrace();
+		}
+    		
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

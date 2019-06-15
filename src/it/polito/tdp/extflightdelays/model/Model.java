@@ -18,6 +18,9 @@ public class Model {
 	List<Airport> vertex;
 	SimpleWeightedGraph<Airport, DefaultWeightedEdge> grafo;
 	
+	List<Airport> best;
+	private double bestVal;
+	
 	public Model(){
 		
 		dao = new ExtFlightDelaysDAO();
@@ -110,5 +113,79 @@ public class Model {
 		}
 		
 		return string;
+	}
+
+	public List<Airport> cercaItinerario(double n, Airport airport) {
+		// TODO Auto-generated method stub
+		List<Airport> parziale = new ArrayList<Airport>();
+		
+		best = new ArrayList<Airport>();
+		
+		cerca(parziale,n,airport);
+		
+		for(Airport airport2 : best)
+			System.out.println(airport2.getAirportName());
+		return best;
+	}
+
+	private void cerca(List<Airport> parziale, double n, Airport airport) {
+		// TODO Auto-generated method stub
+		System.out.println("CERCO");
+		
+		System.out.println(getOre(parziale, airport,null)+" ore!");
+		System.out.println(getOre(best, airport,null)+" ore!");
+			
+			if(getOre(best, airport,null) < getOre(parziale, airport,null)) {
+			best = new ArrayList<Airport>(parziale);
+			System.out.println("NEW BEST");
+			}
+			
+		List<Airport> vicini = Graphs.neighborListOf(grafo, airport);
+		
+		Collections.sort(vicini,new Comparator<Airport>() {
+
+			@Override
+			public int compare(Airport o1, Airport o2) {
+				// TODO Auto-generated method stub
+				DefaultWeightedEdge edge1 = grafo.getEdge(airport, o1);
+				DefaultWeightedEdge edge2 = grafo.getEdge(airport, o2);
+				return (int)(grafo.getEdgeWeight(edge1)-grafo.getEdgeWeight(edge2));
+			}
+		});
+		
+		for(Airport airport2 : vicini) {
+			
+			if(!parziale.contains(airport2) && getOre(parziale,airport,airport2) <= n) {
+				
+				for(Airport a : parziale)
+					System.out.println(a.getAirportName()+"\n");
+				parziale.add(airport2);
+				System.out.println("AGGIUNGO");
+				cerca(parziale, n, airport);
+				parziale.remove(parziale.size()-1);
+			} else {
+				System.out.println("ESCO");
+				return;
+			}
+		}
+	}
+
+	private double getOre(List<Airport> best2, Airport airport, Airport airport2) {
+		// TODO Auto-generated method stub
+		double somma = 0.0;
+		
+		for(Airport a: best2) {
+			
+			DefaultWeightedEdge edge = grafo.getEdge(airport, a);
+			somma += grafo.getEdgeWeight(edge) * 2;
+			
+		}
+		
+		if(airport2 != null) {
+			DefaultWeightedEdge edge = grafo.getEdge(airport, airport2);
+			somma += grafo.getEdgeWeight(edge) * 2;
+		}
+		
+		return somma;
 	}
 }
